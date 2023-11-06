@@ -3,8 +3,14 @@ struct MATERIAL
 	float4					m_cAmbient;
 	float4					m_cDiffuse;
 	float4					m_cSpecular; //a = power
-	float4					m_cEmissive;
+	float4					m_cEmissive; 
+
+	matrix				gmtxTexture;
+	int2				gi2TextureTiling;
+	float2				gf2TextureOffset;
 };
+
+
 
 cbuffer cbCameraInfo : register(b1)
 {
@@ -19,6 +25,7 @@ cbuffer cbGameObjectInfo : register(b2)
 	MATERIAL				gMaterial : packoffset(c4);
 	uint					gnTexturesMask : packoffset(c8);
 };
+
 
 #include "Light.hlsl"
 
@@ -153,37 +160,7 @@ struct VS_SPRITE_TEXTURED_OUTPUT
 	float2 uv : TEXCOORD;
 };
 
-VS_SPRITE_TEXTURED_OUTPUT VSTextured(VS_SPRITE_TEXTURED_INPUT input)
-{
-	VS_SPRITE_TEXTURED_OUTPUT output;
 
-	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
-	output.uv = input.uv;
-
-	return(output);
-}
-
-/*
-float4 PSTextured(VS_SPRITE_TEXTURED_OUTPUT input, uint nPrimitiveID : SV_PrimitiveID) : SV_TARGET
-{
-	float4 cColor;
-	if (nPrimitiveID < 2)
-		cColor = gtxtTextures[0].Sample(gWrapSamplerState, input.uv);
-	else if (nPrimitiveID < 4)
-		cColor = gtxtTextures[1].Sample(gWrapSamplerState, input.uv);
-	else if (nPrimitiveID < 6)
-		cColor = gtxtTextures[2].Sample(gWrapSamplerState, input.uv);
-	else if (nPrimitiveID < 8)
-		cColor = gtxtTextures[3].Sample(gWrapSamplerState, input.uv);
-	else if (nPrimitiveID < 10)
-		cColor = gtxtTextures[4].Sample(gWrapSamplerState, input.uv);
-	else
-		cColor = gtxtTextures[5].Sample(gWrapSamplerState, input.uv);
-	float4 cColor = gtxtTextures[NonUniformResourceIndex(nPrimitiveID/2)].Sample(gWrapSamplerState, input.uv);
-
-	return(cColor);
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -237,3 +214,50 @@ float4 PSTerrain(VS_TERRAIN_OUTPUT input) : SV_TARGET
 
 	return(cColor);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+Texture2D gtxtTexture : register(t17);
+
+//SamplerState gWrapSamplerState : register(s0);
+//SamplerState gClampSamplerState : register(s1);
+
+struct VS_TEXTURED_INPUT
+{
+	float3 position : POSITION;
+	float2 uv : TEXCOORD;
+};
+
+struct VS_TEXTURED_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD;
+};
+
+//VS_TEXTURED_OUTPUT VSTextured(VS_TEXTURED_INPUT input)
+//{
+//	VS_TEXTURED_OUTPUT output;
+//
+//	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+//	output.uv = input.uv;
+//
+//	return(output);
+//}
+//
+//VS_TEXTURED_OUTPUT VSSpriteAnimation(VS_TEXTURED_INPUT input)
+//{
+//	VS_TEXTURED_OUTPUT output;
+//
+//	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+//	output.uv = mul(float3(input.uv, 1.0f), (float3x3)(gMaterial.gmtxTexture)).xy;
+//
+//	return(output);
+//}
+
+//float4 PSTextured_1(VS_TEXTURED_OUTPUT input) : SV_TARGET
+//{
+//	float4 cColor = gtxtTexture.Sample(gssWrap, input.uv);
+//
+//	return(cColor);
+//}

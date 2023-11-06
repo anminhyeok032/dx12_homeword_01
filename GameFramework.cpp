@@ -470,7 +470,7 @@ void CGameFramework::ProcessInput()
 			if (dwDirection) m_pPlayer->Move(dwDirection, 1.25f, true);
 		}
 	}
-	m_pPlayer->Update(m_GameTimer.GetTimeElapsed()*100);
+	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 
 void CGameFramework::AnimateObjects()
